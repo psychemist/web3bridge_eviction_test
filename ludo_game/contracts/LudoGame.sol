@@ -6,10 +6,14 @@ contract LudoGame {
     error ZeroAddressDetected();
 
     uint8 playerCount;
+    uint totalStepsRoundBoard = 32;
+    uint totalStepsInGame= 36;
 
     struct Player {
         uint8 id;
         uint8 stepCounter;
+        uint8 stepsLeft;
+        bool lastStretch;
         bool inHouse;
         bool hasWon;
     }
@@ -19,7 +23,7 @@ contract LudoGame {
     function rollDice() {
     }
 
-    function createPlayer()  returns () {
+    function createPlayer() {
         // Perform sanity check
         _checkAddressZero();
 
@@ -44,9 +48,23 @@ contract LudoGame {
         require(pl.id != 0,"Player not found");
         require(pl.hasWon, "Player Won! Game Over")
 
-        if (player.inHouse) {
-            rollDice();
+        uint256 currentSteps = rollDice();
+
+        if (pl.stepCounter + currentSteps >= totalStepsRoundBoard) {
+            pl.lastStretch = true; 
         }
+
+        if (pl.stepCounter >= totalStepsRoundBoard) {
+
+        }
+
+        pl.stepCounter += currentSteps;
+    }
+
+    function rollDice() returns(uint256) {
+        uint256 seed = block.timestamp / 100000000 & 0x7fffffff
+
+        return (seed % 6) + 1
     }
 
     function _checkAddressZero() {
